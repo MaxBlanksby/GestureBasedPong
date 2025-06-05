@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pong with Hand Control</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+    * { font-family: 'Poppins', sans-serif; }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: ghostwhite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #pongContainer {
+      position: relative;
+    }
+    canvas#pongCanvas {
+      background-color: #000;
+      border: 2px solid #333;
+    }
+    #camContainer {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      width: 200px;
+      height: 150px;
+      border: 2px solid #333;
+      background-color: #000;
+      z-index: 1000;
+    }
+    #camContainer video,
+    #camContainer canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Camera preview now sits fixed over everything -->
+  <div id="camContainer">
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="camCanvas"></canvas>
+  </div>
+
+  <!-- Pong game canvas centered in viewport -->
+  <div id="pongContainer">
+    <canvas id="pongCanvas"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="pong.js"></script>
+  <script src="handTracker.js"></script>
+</body>
+</html>
