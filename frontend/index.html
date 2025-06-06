@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pong with Hand Control</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      font-family: 'Poppins', sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 60px 0 30px;
+      background-color: #f8f8ff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    #pongCanvas {
+      background-color: #8c52ff;
+      border: 3px solid #333;
+      box-shadow: 0 0 20px rgba(0,0,0,0.25);
+    }
+
+    #statusBar {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background-color: #fff;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 999;
+    }
+
+    #statusBar .highlight {
+      color: #8c52ff;
+      font-weight: 600;
+    }
+
+    #camContainer {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 180px;
+      height: 135px;
+      border: 2px solid #333;
+      background-color: #000;
+      z-index: 999;
+    }
+
+    #camContainer video,
+    #camContainer canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    #instructions {
+      font-size: 16px;
+      color: #333;
+      margin-top: 20px;
+      text-align: center;
+      max-width: 600px;
+      line-height: 1.4;
+    }
+
+    #endOverlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      z-index: 1001;
+    }
+
+    #endMessage {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    #restartBtn {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      background-color: #8c52ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    @media screen and (max-width: 600px) {
+      #pongCanvas {
+        width: 90vw !important;
+        height: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="camContainer">
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="camCanvas"></canvas>
+  </div>
+
+  <div id="statusBar">
+    Player: <span id="playerId" class="highlight">...</span><br>
+    Room: <span id="roomId" class="highlight">...</span>
+  </div>
+
+  <canvas id="pongCanvas"></canvas>
+
+  <div id="instructions">
+     Raise or lower your hand to move your paddle. First to 5 points wins! Make sure both players join before starting.
+  </div>
+
+  <div id="endOverlay">
+    <h1 id="endMessage">Player X Wins!</h1>
+    <button id="restartBtn">Restart</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="handtracker.js"></script>
+  <script src="pong.js"></script>
+</body>
+</html>

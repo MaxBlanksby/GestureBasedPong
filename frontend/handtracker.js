@@ -1,19 +1,17 @@
-
 const videoElement = document.getElementById('video');
-const camCanvas    = document.getElementById('camCanvas');
-const camCtx       = camCanvas.getContext('2d');
+const camCanvas = document.getElementById('camCanvas');
+const camCtx = camCanvas.getContext('2d');
 
-const canvasWidth  = 640;
+const canvasWidth = 640;
 const canvasHeight = 480;
-videoElement.width  = canvasWidth;
+videoElement.width = canvasWidth;
 videoElement.height = canvasHeight;
-camCanvas.width  = canvasWidth;
+camCanvas.width = canvasWidth;
 camCanvas.height = canvasHeight;
 
 const lastYs = [];
-const SMOOTHING_FRAMES  = 10;
-
-const AMPLIFICATION     = 1.2;
+const SMOOTHING_FRAMES = 10;
+let smoothedY = 0.5;
 
 const hands = new Hands({
   locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
@@ -45,25 +43,34 @@ function onResults(results) {
     drawConnectors(camCtx, landmarks, HAND_CONNECTIONS, { color: '#00FF00', lineWidth: 2 });
     drawLandmarks(camCtx, landmarks, { color: '#FF0000', lineWidth: 1 });
 
-    //get y value 
-    let yNorm = landmarks[0].y; 
+    const wristY = landmarks[0].y;
+    lastYs.push(wristY);
+    if (lastYs.length > SMOOTHING_FRAMES) lastYs.shift();
 
-    lastYs.push(yNorm);
-    if (lastYs.length > SMOOTHING_FRAMES) {
-      lastYs.shift();
-    }
-    const sumYs = lastYs.reduce((a, b) => a + b, 0);
-    const yAvg   = sumYs / lastYs.length;
-
-    let delta = yAvg - 0.5;       
-    delta = delta * AMPLIFICATION;
-    if (delta > 0.5) delta = 0.5;
-    if (delta < -0.5) delta = -0.5;
-    const mappedY = delta + 0.5;  
-
-    const payload = { xNorm: landmarks[0].x, yNorm: yAvg, mappedY };
-    window.dispatchEvent(new CustomEvent('handPosition', { detail: payload }));
+    const average = lastYs.reduce((a, b) => a + b, 0) / lastYs.length;
+    const amplification = 1.2;
+    let delta = (average - 0.5) * amplification;
+    delta = Math.max(-0.5, Math.min(0.5, delta));
+    smoothedY = delta + 0.5;
   }
 
   camCtx.restore();
 }
+
+window.getSmoothedHandY = () => smoothedY;
+
+setInterval(() => {
+  if (typeof getSmoothedHandY !== 'function') return;
+
+  const normY = getSmoothedHandY();
+  const canvasHeight = 1000;
+  const paddleHeight = 180;
+  const newY = Math.min(Math.max(0, normY * canvasHeight - paddleHeight / 2), canvasHeight - paddleHeight);
+
+  if (window.socket && window.socket.readyState === WebSocket.OPEN) {
+    window.socket.send(JSON.stringify({
+      type: 'paddleMove',
+      y: newY
+    }));
+  }
+}, 1000 / 60);
